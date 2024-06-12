@@ -4,6 +4,8 @@ public class Member{
     int chargeTime;
     int entranceTime;
     int leaveTime;
+    int x;
+    int y;
 
     public Member(String id, String pw){
         this.id = id;
@@ -11,6 +13,8 @@ public class Member{
         this.chargeTime = 0;
         this.entranceTime = -1;
         this.leaveTime = -1;
+        this.x = -1;
+        this.y = -1;
     }
 
     public String GetId() {
@@ -34,6 +38,31 @@ public class Member{
     }
 
     public int GetChargeTime() {
-        return chargeTime;
+        return this.chargeTime;
+    }
+
+    public void SetX(int x) {
+        this.x = x;
+    }
+
+    public void SetY(int y) {
+        this.y = y;
+    }
+
+    public int GetX() {
+        return this.x;
+    }
+
+    public int GetY() {
+        return this.y;
+    }
+
+    public void SubtractChargeTime(int minutes) {
+        if (this.chargeTime >= minutes) {
+            this.chargeTime -= minutes;
+        }
+        else {
+            this.chargeTime = 0;
+        }
     }
 }

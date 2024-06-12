@@ -55,9 +55,20 @@ public class InternetCafe {
             System.out.print("비밀번호 : ");
             pw = sc.next();
             AddMember(id, pw);
+            Print.ClearConsole();
             Print.print();
             System.out.println("회원가입이 완료되었습니다.");
         }
+    }
+
+    public void LogOut(Scanner sc, Member member) {
+        Print.ClearConsole();
+        Print.print();
+        System.out.print("퇴장 시간을 입력하세요(분) : ");
+        int leaveTime = sc.nextInt();
+        member.SetLeaveTime(leaveTime);
+        int usedTime = leaveTime - member.entranceTime;
+        member.SubtractChargeTime(usedTime - 1);
     }
 
     public void AddMember(String id, String pw) {
@@ -67,15 +78,24 @@ public class InternetCafe {
 
     public void MemberMenu(Scanner sc, Member member) {
         boolean running = true;
+        Print.ClearConsole();
         while (running) {
-            Print.ClearConsole();
             Print.print();
             System.out.println("현재 아이디 : " + member.GetId());
+            System.out.println("충전된 시간(분) : " + member.GetChargeTime());
+
+            System.out.println();
             System.out.println("1 : 시간 충전");
             System.out.println("2 : 자리 예약");
             System.out.println("3 : 로그아웃");
-            System.out.print("선택: ");
-            int choice = sc.nextInt();
+            Print.print();
+            int choice = 0;
+            try {
+                choice = sc.nextInt();
+            } catch (Exception e) {
+                System.out.println("숫자를 올바르게 입력해주세요.");
+                choice = 0;
+            }
             Print.print();
             switch (choice) {
                 case 1:
@@ -85,7 +105,10 @@ public class InternetCafe {
                     ReserveSeat(sc, member);
                     break;
                 case 3:
+                    LogOut(sc, member);
                     running = false;
+                    Print.ClearConsole();
+                    Print.print();
                     System.out.println("로그아웃 되었습니다.");
                     break;
                 default:
@@ -95,6 +118,8 @@ public class InternetCafe {
     }
 
     public void ChargeTime(Scanner sc, Member member) {
+        Print.ClearConsole();
+        Print.print();
         System.out.print("충전할 시간(분) : ");
         int minutes = sc.nextInt();
         member.AddChargeTime(minutes);
@@ -102,21 +127,67 @@ public class InternetCafe {
     }
 
     public void ReserveSeat(Scanner sc, Member member) {
-        System.out.print("예약할 좌석의 X 좌표 : ");
-        int x = sc.nextInt();
-        System.out.print("예약할 좌석의 Y 좌표 : ");
-        int y = sc.nextInt();
-
-        if (x >= 0 && x < seats.length && y >= 0 && y < seats[0].length && !seats[x][y].IsUsed()) {
-            seats[x][y].SetUsed(true);
-            System.out.println("좌석 예약이 완료되었습니다.");
+        Print.ClearConsole();
+        Print.print();
+        if (seats == null) {
+            System.out.println("좌석이 설정되지 않았습니다.");
+            System.out.println("관리자에게 문의하십시오.");
+            return;
         }
-        else if (seats[x][y].IsUsed()) {
-            System.out.println("이미 사용 중입니다.");
+        if (member.GetX() != -1) {
+            System.out.println("이미 좌석 예약을 했습니다.");
+            System.out.println("좌석 예약을 취소하시겠습니까?");
+            System.out.println("1 : 예약 취소");
+            System.out.println("2 : 돌아가기");
+            Print.print();
+            int s = sc.nextInt();
+            switch (s) {
+                case 1:
+                    int x = member.GetX();
+                    int y = member.GetY();
+                    seats[x - 1][y - 1].SetUsed(false);
+                    member.SetX(-1);
+                    member.SetY(-1);
+                    CancelReservation(sc, member);
+                    break;
+                case 2:
+                    break;
+                default:
+                    break;
+            }
+            return;
+        }
+        System.out.print("예약할 좌석의 X 좌표(1 ~ " + seats.length + ") : ");
+        int x = sc.nextInt() - 1;
+        System.out.print("예약할 좌석의 Y 좌표(1 ~ " + seats[0].length + ") : ");
+        int y = sc.nextInt() - 1;
+
+        if (x >= 0 && x < seats.length && y >= 0 && y < seats[0].length) {
+            if (!seats[x][y].IsUsed()) {
+                seats[x][y].SetUsed(true);
+                System.out.println("좌석 예약이 완료되었습니다.");
+                member.SetX(x + 1);
+                member.SetY(y + 1);
+                System.out.println("입장 시간을 입력하세요(분) : ");
+                int entranceTime = sc.nextInt();
+                member.SetEntranceTime(entranceTime);
+            }
+            else if (seats[x][y].IsUsed()) {
+                System.out.println("이미 사용 중입니다.");
+            }
         }
         else {
             System.out.println("잘못된 좌석 번호입니다.");
         }
+    }
+
+    public void CancelReservation(Scanner sc, Member member) {
+        Print.ClearConsole();
+        Print.print();
+        System.out.println("예약 취소 시간을 입력하세요(분) : ");
+        int cancelTime = sc.nextInt();
+        member.SubtractChargeTime(cancelTime - member.entranceTime);
+        member.SetEntranceTime(-1);
     }
 
     public void AdminMenu(Scanner sc) {
@@ -128,7 +199,7 @@ public class InternetCafe {
             System.out.println("2 : 회원 목록");
             System.out.println("3 : 좌석 설정");
             System.out.println("4 : 로그아웃");
-            System.out.print("선택 : ");
+            Print.print();
             int choice = sc.nextInt();
             Print.print();
             switch (choice) {
@@ -143,6 +214,8 @@ public class InternetCafe {
                     break;
                 case 4:
                     running = false;
+                    Print.ClearConsole();
+                    Print.print();
                     System.out.println("관리자 로그아웃 되었습니다.");
                     break;
                 default:
@@ -152,29 +225,42 @@ public class InternetCafe {
     }
 
     public void ViewSeats() {
+        Print.ClearConsole();
+        Print.print();
         if (seats == null) {
             System.out.println("좌석이 설정되지 않았습니다.");
             return;
         }
-        
+        System.out.println("X : 1 ~ " + seats.length);
+        System.out.println("Y : 1 ~ " + seats[0].length);
         System.out.println("현재 채워진 좌석 : ");
         for (int i = 0; i < seats.length; i++) {
             for (int j = 0; j < seats[i].length; j++) {
                 if (seats[i][j].IsUsed()) {
-                    System.out.printf("좌석 (%d, %d)\n", i, j);
+                    System.out.printf("좌석 (%d, %d)\n", i + 1, j + 1);
                 }
             }
         }
     }
 
     public void ViewMembers() {
+        Print.ClearConsole();
+        Print.print();
         System.out.println("회원 목록:");
         for (Member member : memberList) {
-            System.out.printf("ID: %s, 충전 시간: %d분\n", member.GetId(), member.GetChargeTime());
+            if (member.GetId().equals("admin"))
+                continue;
+            System.out.println("ID : " + member.GetId() + ", 충전 시간 : " + member.GetChargeTime() + "분");
         }
     }
 
     public void SetSeats(Scanner sc) {
+        Print.ClearConsole();
+        Print.print();
+        if (seats != null) {
+            System.out.println("이미 좌석이 설정되어 있습니다.");
+            return;
+        }
         System.out.print("좌석 행의 수를 입력하세요: ");
         int rows = sc.nextInt();
         System.out.print("좌석 열의 수를 입력하세요: ");
@@ -183,13 +269,16 @@ public class InternetCafe {
     }
 
     public void setSeats(int rows, int cols) {
+        Print.ClearConsole();
+        Print.print();
         seats = new Seat[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 seats[i][j] = new Seat(i, j);
             }
         }
-        System.out.println("좌석 설정이 완료되었습니다.");
+        System.out.println("좌석 설정이 완료되었습니다.\n");
+
         System.out.println(rows + " X " + cols);
     }
 }

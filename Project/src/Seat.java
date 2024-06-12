@@ -1,4 +1,3 @@
-
 public class Seat {
     int x;
     int y;
