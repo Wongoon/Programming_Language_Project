@@ -67,8 +67,7 @@ public class InternetCafe {
         System.out.print("퇴장 시간을 입력하세요(분) : ");
         int leaveTime = sc.nextInt();
         member.SetLeaveTime(leaveTime);
-        int usedTime = leaveTime - member.entranceTime;
-        member.SubtractChargeTime(usedTime - 1);
+        member.SubtractChargeTime(leaveTime);
     }
 
     public void AddMember(String id, String pw) {
@@ -86,7 +85,7 @@ public class InternetCafe {
 
             System.out.println();
             System.out.println("1 : 시간 충전");
-            System.out.println("2 : 자리 예약");
+            System.out.println("2 : 좌석 예약");
             System.out.println("3 : 로그아웃");
             Print.print();
             int choice = 0;
@@ -168,9 +167,6 @@ public class InternetCafe {
                 System.out.println("좌석 예약이 완료되었습니다.");
                 member.SetX(x + 1);
                 member.SetY(y + 1);
-                System.out.println("입장 시간을 입력하세요(분) : ");
-                int entranceTime = sc.nextInt();
-                member.SetEntranceTime(entranceTime);
             }
             else if (seats[x][y].IsUsed()) {
                 System.out.println("이미 사용 중입니다.");
@@ -184,10 +180,9 @@ public class InternetCafe {
     public void CancelReservation(Scanner sc, Member member) {
         Print.ClearConsole();
         Print.print();
-        System.out.println("예약 취소 시간을 입력하세요(분) : ");
+        System.out.print("예약 취소 시간을 입력하세요(분) : ");
         int cancelTime = sc.nextInt();
-        member.SubtractChargeTime(cancelTime - member.entranceTime);
-        member.SetEntranceTime(-1);
+        member.SubtractChargeTime(cancelTime);
     }
 
     public void AdminMenu(Scanner sc) {
@@ -233,7 +228,7 @@ public class InternetCafe {
         }
         System.out.println("X : 1 ~ " + seats.length);
         System.out.println("Y : 1 ~ " + seats[0].length);
-        System.out.println("현재 채워진 좌석 : ");
+        System.out.println("현재 예약된 좌석 : ");
         for (int i = 0; i < seats.length; i++) {
             for (int j = 0; j < seats[i].length; j++) {
                 if (seats[i][j].IsUsed()) {
@@ -246,7 +241,7 @@ public class InternetCafe {
     public void ViewMembers() {
         Print.ClearConsole();
         Print.print();
-        System.out.println("회원 목록:");
+        System.out.println("회원 목록 :");
         for (Member member : memberList) {
             if (member.GetId().equals("admin"))
                 continue;

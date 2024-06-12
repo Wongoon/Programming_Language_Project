@@ -2,7 +2,6 @@ public class Member{
     String id;
     String pw;
     int chargeTime;
-    int entranceTime;
     int leaveTime;
     int x;
     int y;
@@ -11,7 +10,6 @@ public class Member{
         this.id = id;
         this.pw = pw;
         this.chargeTime = 0;
-        this.entranceTime = -1;
         this.leaveTime = -1;
         this.x = -1;
         this.y = -1;
@@ -27,10 +25,6 @@ public class Member{
 
     public void AddChargeTime(int minutes) {
         this.chargeTime += minutes;
-    }
-
-    public void SetEntranceTime(int entranceTime) {
-        this.entranceTime = entranceTime;
     }
 
     public void SetLeaveTime(int leaveTime) {
